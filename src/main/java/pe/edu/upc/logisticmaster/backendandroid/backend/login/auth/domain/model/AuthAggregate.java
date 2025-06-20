@@ -11,7 +11,7 @@ import lombok.Setter;
 public class AuthAggregate {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Se genera automáticamente
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Getter
@@ -24,7 +24,7 @@ public class AuthAggregate {
 
     // Constructor vacío requerido por JPA
     protected AuthAggregate() {}
-    
+
     public AuthAggregate(String email, String password) {
         this.email = email;
         this.password = password;
