@@ -11,7 +11,6 @@ public class AuthService {
     private AuthRepository authRepository;
 
     public boolean authenticateUser(AuthCommand command) {
-        // Verifica las credenciales con la base de datos
         return authRepository.existsByEmailAndPassword(command.getEmail(), command.getPassword());
     }
 }
