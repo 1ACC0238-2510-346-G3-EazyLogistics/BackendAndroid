@@ -11,7 +11,7 @@ public class CustomerDto {
         this.id = customer.getId();
         this.name = customer.getName();
         this.email = customer.getEmail();
-    }   
+    }
 
     // Getters y Setters
 }

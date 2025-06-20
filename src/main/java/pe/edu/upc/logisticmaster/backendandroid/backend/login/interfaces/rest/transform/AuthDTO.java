@@ -1,13 +1,15 @@
-package pe.edu.upc.logisticmaster.backendandroid.backend.login.auth.domain.model;
+package pe.edu.upc.logisticmaster.backendandroid.backend.login.interfaces.rest.transform;
 
-public class AuthCommand {
+import pe.edu.upc.logisticmaster.backendandroid.backend.login.auth.domain.model.AuthAggregate;
+
+public class AuthDTO {
     private String email;
     private String password;
 
     // Constructor
-    public AuthCommand(String email, String password) {
-        this.email = email;
-        this.password = password;
+    public AuthDTO(AuthAggregate authAggregate) {
+        this.email = authAggregate.getEmail();
+        this.password = authAggregate.getPassword();
     }
 
     // Getters y Setters
