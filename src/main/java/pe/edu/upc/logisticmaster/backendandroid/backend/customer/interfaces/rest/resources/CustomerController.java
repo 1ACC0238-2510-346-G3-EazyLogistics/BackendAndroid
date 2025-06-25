@@ -1,26 +1,26 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.customer.interfaces.rest.resources;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import pe.edu.upc.logisticmaster.backendandroid.backend.customer.domain.model.CustomerCommand;
-import pe.edu.upc.logisticmaster.backendandroid.backend.customer.domain.model.CustomerService;
 import pe.edu.upc.logisticmaster.backendandroid.backend.customer.interfaces.rest.transform.CustomerDto;
+import pe.edu.upc.logisticmaster.backendandroid.backend.customer.internal.QueryService.CustomerQueryService;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/customers")
 public class CustomerController {
 
     @Autowired
-    private CustomerService customerService;
-
-    @PostMapping("/")
-    public void createCustomer(@RequestBody CustomerCommand command) {
-        customerService.createCustomer(command);
-    }
+    private CustomerQueryService customerQueryService;
 
     @GetMapping("/{id}")
     public CustomerDto getCustomerById(@PathVariable String id) {
-
-        return new CustomerDto(customerService.getCustomerById(id));
+        return customerQueryService.getCustomerById(id);
     }
+
+    @PostMapping
+    public void createCustomer(@RequestBody CustomerCommand command) {
+        customerQueryService.executeCreateCustomer(command);
+    }
+
 }

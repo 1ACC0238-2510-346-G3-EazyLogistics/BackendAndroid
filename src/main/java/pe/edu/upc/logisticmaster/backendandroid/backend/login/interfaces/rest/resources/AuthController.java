@@ -15,7 +15,6 @@ public class AuthController {
 
     @PostMapping("/Login")
     public AuthAggregate login(@RequestBody AuthCommand authCommand) {
-        // Desempaquetamos el email y la contraseña del comando
         String email = authCommand.getEmail();
         String password = authCommand.getPassword();
 

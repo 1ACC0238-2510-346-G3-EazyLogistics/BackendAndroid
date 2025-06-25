@@ -11,7 +11,10 @@ public class CustomerCommandService {
     @Autowired
     private CustomerService customerService;
 
+    // Método para ejecutar la creación de un cliente
     public void executeCreateCustomer(CustomerCommand command) {
         customerService.createCustomer(command);
     }
+
+    // Otros métodos para ejecutar actualizaciones, eliminaciones, etc.
 }

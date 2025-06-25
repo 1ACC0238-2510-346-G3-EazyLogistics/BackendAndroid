@@ -2,6 +2,7 @@ package pe.edu.upc.logisticmaster.backendandroid.backend.customer.internal.Query
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pe.edu.upc.logisticmaster.backendandroid.backend.customer.domain.model.CustomerCommand;
 import pe.edu.upc.logisticmaster.backendandroid.backend.customer.interfaces.rest.transform.CustomerDto;
 import pe.edu.upc.logisticmaster.backendandroid.backend.customer.domain.model.CustomerService;
 
@@ -14,4 +15,9 @@ public class CustomerQueryService {
     public CustomerDto getCustomerById(String id) {
         return new CustomerDto(customerService.getCustomerById(id));
     }
+
+    public void executeCreateCustomer(CustomerCommand command) {
+    }
+
+
 }

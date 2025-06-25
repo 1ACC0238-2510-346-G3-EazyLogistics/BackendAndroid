@@ -4,8 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 public class ReserveAggregate {
@@ -18,7 +16,6 @@ public class ReserveAggregate {
     private String status;
     private String startTime;
     private String endTime;
-
 
     public ReserveAggregate(Integer userId, Integer roomId, String status, String startTime, String endTime) {
         this.userId = userId;
