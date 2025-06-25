@@ -5,17 +5,17 @@ import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.Work
 public class WorkerDto {
     private Long id;
     private String name;
-    private String position;
     private String email;
+    private String position;
     private boolean isActive;
 
-    // Constructor para mapear WorkerAggregate a WorkerDto
+    // Constructor a partir de WorkerAggregate
     public WorkerDto(WorkerAggregate worker) {
-        this.id = worker.getId();      // Asegúrate de que getId() esté generado por Lombok o manualmente
-        this.name = worker.getName();  // Asegúrate de que getName() esté generado por Lombok o manualmente
-        this.position = worker.getPosition(); // Asegúrate de que getPosition() esté generado por Lombok o manualmente
-        this.email = worker.getEmail();  // Esto funciona si tienes getEmail() en WorkerAggregate
-        this.isActive = worker.isActive(); // Asegúrate de que isActive() esté generado por Lombok o manualmente
+        this.id = worker.getId();
+        this.name = worker.getName();
+        this.email = worker.getEmail();
+        this.position = worker.getPosition();
+        this.isActive = worker.isActive();
     }
 
     // Getters y Setters
@@ -35,20 +35,20 @@ public class WorkerDto {
         this.name = name;
     }
 
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     public boolean isActive() {
