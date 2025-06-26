@@ -1,38 +1,41 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model;
 
 import jakarta.persistence.*;
-import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model.User;
+import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerAggregate;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@Table(name = "task")
 public class Task {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
-
     private String description;
-
     private String createdAt;
-
     private String updatedAt;
 
-    // Relación con User (asignado a un usuario)
-    @ManyToOne
-    @JoinColumn(name = "assigned_to", referencedColumnName = "email")
-    private User assignedTo;
+    @ManyToMany
+    @JoinTable(
+            name = "worker_task",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "worker_id")
+    )
+    private Set<WorkerAggregate> workers = new HashSet<>();
 
-    // Constructor
-    public Task(String title, String description, String createdAt, String updatedAt, User assignedTo) {
+    public Task() {}
+
+    public Task(String title, String description, String createdAt, String updatedAt) {
         this.title = title;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.assignedTo = assignedTo;
     }
 
-    // Getters y Setters
+    // --- Getters & Setters ---
     public Long getId() {
         return id;
     }
@@ -73,11 +76,11 @@ public class Task {
         this.updatedAt = updatedAt;
     }
 
-    public User getAssignedTo() {
-        return assignedTo;
+    public Set<WorkerAggregate> getWorkers() {
+        return workers;
     }
 
-    public void setAssignedTo(User assignedTo) {
-        this.assignedTo = assignedTo;
+    public void setWorkers(Set<WorkerAggregate> workers) {
+        this.workers = workers;
     }
 }

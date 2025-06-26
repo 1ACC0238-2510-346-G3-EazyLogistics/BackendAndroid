@@ -2,7 +2,7 @@ package pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.QueryServ
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.Task;
+
 import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.services.TaskService;
 import pe.edu.upc.logisticmaster.backendandroid.backend.task.interfaces.rest.transform.TaskDto;
 
@@ -15,19 +15,21 @@ public class TaskQueryService {
     @Autowired
     private TaskService taskService;
 
-    // Obtener todas las tareas
-    public List<TaskDto> getAllTasks() {
-        List<Task> tasks = taskService.getAllTasks();
-        return tasks.stream().map(TaskDto::new).collect(Collectors.toList());
-    }
-
-    // Obtener tarea por ID
     public TaskDto getTaskById(Long id) {
-        Task task = taskService.getTaskById(id);
+        var task = taskService.getTaskById(id);
+        if (task == null) {
+            throw new RuntimeException("Tarea no encontrada con ID " + id);
+        }
         return new TaskDto(task);
     }
 
-    // Eliminar tarea por ID
+    public List<TaskDto> getAllTasks() {
+        return taskService.getAllTasks()
+                .stream()
+                .map(TaskDto::new)
+                .collect(Collectors.toList());
+    }
+
     public void deleteTask(Long id) {
         taskService.deleteTask(id);
     }

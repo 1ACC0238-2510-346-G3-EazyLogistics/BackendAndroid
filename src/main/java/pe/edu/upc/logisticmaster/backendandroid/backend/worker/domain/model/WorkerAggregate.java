@@ -1,36 +1,51 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.Task;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@Table(name = "worker_aggregate")
 public class WorkerAggregate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String email;
     private String name;
     private String position;
-    private String email;
     private boolean isActive;
 
-    // Constructor
-    public WorkerAggregate(String name, String position, String email, boolean isActive) {
+    @ManyToMany(mappedBy = "workers")
+    private Set<Task> tasks = new HashSet<>();
+
+    public WorkerAggregate() {}
+
+    public WorkerAggregate(String email, String name, String position, boolean isActive) {
+        this.email = email;
         this.name = name;
         this.position = position;
-        this.email = email;
         this.isActive = isActive;
     }
 
-    // Métodos Getters y Setters
+    // --- Getters & Setters ---
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getName() {
@@ -49,19 +64,19 @@ public class WorkerAggregate {
         this.position = position;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public boolean isActive() {
         return isActive;
     }
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public Set<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(Set<Task> tasks) {
+        this.tasks = tasks;
     }
 }
