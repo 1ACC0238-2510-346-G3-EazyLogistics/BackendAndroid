@@ -1,76 +1,56 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.reserve.domain.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model.User;
 
 @Entity
+@Table(name = "reserve_aggregate")
 public class ReserveAggregate {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // La base de datos generará el id automáticamente
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer userId;
     private Integer roomId;
     private String status;
     private String startTime;
     private String endTime;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private Long userId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public ReserveAggregate(Long userId, Integer roomId, String status, String startTime, String endTime) {}
+
     public ReserveAggregate(Integer userId, Integer roomId, String status, String startTime, String endTime) {
-        this.userId = userId;
-        this.roomId = roomId;
-        this.status = status;
+        this.userId    = Long.valueOf(userId);
+        this.roomId    = roomId;
+        this.status    = status;
         this.startTime = startTime;
-        this.endTime = endTime;
+        this.endTime   = endTime;
     }
 
-    // Métodos Getters y Setters
-    public Integer getId() {
-        return id;
-    }
+    // getters y setters...
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    public Integer getRoomId() { return roomId; }
+    public void setRoomId(Integer roomId) { this.roomId = roomId; }
 
-    public Integer getUserId() {
-        return userId;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
+    public String getStartTime() { return startTime; }
+    public void setStartTime(String startTime) { this.startTime = startTime; }
 
-    public Integer getRoomId() {
-        return roomId;
-    }
+    public String getEndTime() { return endTime; }
+    public void setEndTime(String endTime) { this.endTime = endTime; }
 
-    public void setRoomId(Integer roomId) {
-        this.roomId = roomId;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

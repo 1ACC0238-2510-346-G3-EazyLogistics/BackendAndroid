@@ -15,22 +15,23 @@ public class ReserveQueryService {
     @Autowired
     private ReserveService reserveService;
 
-    // Método para obtener una reserva por ID y devolverla como DTO
+    /**
+     * Obtiene una reserva por ID y la mapea a DTO,
+     * incluyendo los datos del usuario asociado.
+     * @throws RuntimeException si la reserva no existe.
+     */
     public ReserveDto getReserveById(Integer id) {
-        // Llamamos al servicio para obtener la reserva de la base de datos
-        ReserveAggregate reserve = reserveService.getReserveById(id);
-
-        // Convertimos la reserva en un DTO para la transferencia de datos
+        ReserveAggregate reserve = reserveService.getReserveById(id);  // arroja RuntimeException si no la encuentra
         return new ReserveDto(reserve);
     }
 
-    // Método para obtener todas las reservas
+    /**
+     * Lista todas las reservas como DTO,
+     * cada uno con su usuario embebido.
+     */
     public List<ReserveDto> getAllReserves() {
-        // Obtener todas las reservas desde el servicio
-        List<ReserveAggregate> reserves = reserveService.getAllReserves();
-
-        // Convertir las reservas en DTOs
-        return reserves.stream()
+        return reserveService.getAllReserves()
+                .stream()
                 .map(ReserveDto::new)
                 .collect(Collectors.toList());
     }

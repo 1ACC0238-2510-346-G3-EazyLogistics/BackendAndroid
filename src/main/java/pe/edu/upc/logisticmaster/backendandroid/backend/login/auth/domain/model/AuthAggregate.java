@@ -1,36 +1,31 @@
+// src/main/java/pe/edu/upc/logisticmaster/backendandroid/backend/login/auth/domain/model/AuthAggregate.java
 package pe.edu.upc.logisticmaster.backendandroid.backend.login.auth.domain.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "auth_aggregate")
 public class AuthAggregate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
 
-    // Constructor vacío requerido por JPA
-    protected AuthAggregate() {}
+    public AuthAggregate() {}
 
-    // Constructor con parámetros
     public AuthAggregate(String email, String password) {
-        this.email = email;
+        this.email    = email;
         this.password = password;
     }
 
-    // Métodos Getters y Setters
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getEmail() {

@@ -1,55 +1,54 @@
+// src/main/java/pe/edu/upc/logisticmaster/backendandroid/backend/user/domain/model/User.java
 package pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model;
 
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+import pe.edu.upc.logisticmaster.backendandroid.backend.reserve.domain.model.ReserveAggregate;
 import pe.edu.upc.logisticmaster.backendandroid.backend.login.auth.domain.model.AuthAggregate;
 
 @Entity
+@Table(name = "user")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
+    // Clave natural para enlazar con AuthAggregate
+    @Column(unique = true, nullable = false)
     private String email;
 
+    private String name;
     private String phoneNumber;
-
     private String profilePictureUrl;
-
     private boolean isActive;
 
-    // Relación con AuthAggregate (email es la referencia)
+    // FK user.email → auth_aggregate.email
     @OneToOne
-    @JoinColumn(name = "email", referencedColumnName = "email", insertable = false, updatable = false)
+    @JoinColumn(
+            name = "email",
+            referencedColumnName = "email",
+            insertable = false,
+            updatable = false
+    )
     private AuthAggregate authAggregate;
 
-    // Constructor
-    public User(String name, String email, String phoneNumber, String profilePictureUrl, boolean isActive) {
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
+    @OneToMany(mappedBy = "user")
+    private Set<ReserveAggregate> reserves = new HashSet<>();
+
+    public User() {}
+
+    public User(String email, String name, String phoneNumber, String profilePictureUrl, boolean isActive) {
+        this.email             = email;
+        this.name              = name;
+        this.phoneNumber       = phoneNumber;
         this.profilePictureUrl = profilePictureUrl;
-        this.isActive = isActive;
+        this.isActive          = isActive;
     }
 
-
-    // Getters y Setters
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getEmail() {
@@ -58,6 +57,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPhoneNumber() {
@@ -82,5 +89,17 @@ public class User {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public AuthAggregate getAuthAggregate() {
+        return authAggregate;
+    }
+
+    public Set<ReserveAggregate> getReserves() {
+        return reserves;
+    }
+
+    public void setReserves(Set<ReserveAggregate> reserves) {
+        this.reserves = reserves;
     }
 }

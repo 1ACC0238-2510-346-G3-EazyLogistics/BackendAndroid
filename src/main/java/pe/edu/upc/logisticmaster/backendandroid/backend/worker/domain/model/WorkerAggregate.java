@@ -1,43 +1,57 @@
+// src/main/java/pe/edu/upc/logisticmaster/backendandroid/backend/worker/domain/model/WorkerAggregate.java
 package pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model;
 
 import jakarta.persistence.*;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.Task;
-
 import java.util.HashSet;
 import java.util.Set;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.Task;
+import pe.edu.upc.logisticmaster.backendandroid.backend.login.auth.domain.model.AuthAggregate;
 
 @Entity
 @Table(name = "worker_aggregate")
 public class WorkerAggregate {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    // Clave natural para enlazar con AuthAggregate
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String name;
     private String position;
     private boolean isActive;
 
-    @ManyToMany(mappedBy = "workers")
+    // FK worker_aggregate.email → auth_aggregate.email
+    @OneToOne
+    @JoinColumn(
+            name = "email",
+            referencedColumnName = "email",
+            insertable = false,
+            updatable = false
+    )
+    private AuthAggregate authAggregate;
+
+    @ManyToMany
+    @JoinTable(
+            name = "worker_task",
+            joinColumns = @JoinColumn(name = "worker_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id")
+    )
     private Set<Task> tasks = new HashSet<>();
 
     public WorkerAggregate() {}
 
     public WorkerAggregate(String email, String name, String position, boolean isActive) {
-        this.email = email;
-        this.name = name;
+        this.email    = email;
+        this.name     = name;
         this.position = position;
         this.isActive = isActive;
     }
 
-    // --- Getters & Setters ---
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getEmail() {
@@ -70,6 +84,10 @@ public class WorkerAggregate {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public AuthAggregate getAuthAggregate() {
+        return authAggregate;
     }
 
     public Set<Task> getTasks() {

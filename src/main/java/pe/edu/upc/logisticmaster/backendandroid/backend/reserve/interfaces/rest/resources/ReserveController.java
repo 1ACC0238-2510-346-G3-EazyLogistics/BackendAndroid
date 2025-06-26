@@ -17,16 +17,39 @@ import java.util.List;
 public class ReserveController {
 
     @Autowired
-    private ReserveService reserveService;                  // Servicio de dominio :contentReference[oaicite:7]{index=7}
+    private ReserveService reserveService;
 
     @Autowired
-    private ReserveQueryService reserveQueryService;        // Servicio de consulta :contentReference[oaicite:8]{index=8}
+    private ReserveQueryService reserveQueryService;
 
     /**
-     * Crear reserva
-     * - 201 Created con ReserveDto
-     * - 400 Bad Request si faltan datos
-     * - 500 Internal Server Error en excepciones
+     * GET /api/reserves/{id}
+     * – 200 OK con ReserveDto (incluye datos de UserDto)
+     * – 404 Not Found si no existe
+     * – 500 Internal Server Error en errores inesperados
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        try {
+            ReserveDto dto = reserveQueryService.getReserveById(id);
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException notFound) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(notFound.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno al obtener la reserva");
+        }
+    }
+
+    /**
+     * POST /api/reserves
+     * – 201 Created con ReserveDto
+     * – 400 Bad Request si faltan datos
+     * – 500 Internal Server Error en excepciones
      */
     @PostMapping
     public ResponseEntity<?> createReserve(@RequestBody ReserveCommand cmd) {
@@ -39,12 +62,11 @@ public class ReserveController {
                     .badRequest()
                     .body("Faltan campos obligatorios: userId, roomId, status, startTime, endTime");
         }
-
         try {
             var created = reserveService.createReserve(cmd);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(new ReserveDto(created));         // Construye el DTO :contentReference[oaicite:9]{index=9}
+                    .body(new ReserveDto(created));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity
@@ -54,9 +76,9 @@ public class ReserveController {
     }
 
     /**
-     * Listar todas las reservas
-     * - 200 OK con lista de ReserveDto
-     * - 500 Internal Server Error en excepciones
+     * GET /api/reserves
+     * – 200 OK con lista de ReserveDto
+     * – 500 Internal Server Error en excepciones
      */
     @GetMapping
     public ResponseEntity<?> listAll() {
@@ -72,46 +94,21 @@ public class ReserveController {
     }
 
     /**
-     * Obtener reserva por ID
-     * - 200 OK con ReserveDto
-     * - 404 Not Found si no existe
-     * - 500 Internal Server Error en excepciones
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        try {
-            // getReserveById lanza RuntimeException si no encuentra :contentReference[oaicite:10]{index=10}
-            ReserveDto dto = reserveQueryService.getReserveById(id);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException notFound) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("No se encontró la reserva con ID " + id);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al obtener la reserva");
-        }
-    }
-
-    /**
-     * Eliminar reserva por ID
-     * - 200 OK si se elimina
-     * - 404 Not Found si no existe
-     * - 500 Internal Server Error en excepciones
+     * DELETE /api/reserves/{id}
+     * – 200 OK si se elimina
+     * – 404 Not Found si no existe
+     * – 500 Internal Server Error en excepciones
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
         try {
-            // Intentamos obtener primero para verificar existencia
-            reserveService.getReserveById(id);                // arroja RuntimeException si no existe :contentReference[oaicite:11]{index=11}
+            reserveService.getReserveById(id); // arroja RuntimeException si no existe
             reserveService.deleteReserve(id);
             return ResponseEntity.ok("Reserva eliminada correctamente");
         } catch (RuntimeException notFound) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("No se encontró la reserva con ID " + id);
+                    .body(notFound.getMessage());
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity
@@ -121,18 +118,17 @@ public class ReserveController {
     }
 
     /**
-     * Actualizar reserva por ID
-     * - 200 OK con ReserveDto
-     * - 400 Bad Request si faltan datos
-     * - 404 Not Found si no existe
-     * - 500 Internal Server Error en excepciones
+     * PUT /api/reserves/{id}
+     * – 200 OK con ReserveDto
+     * – 400 Bad Request si faltan datos
+     * – 404 Not Found si no existe
+     * – 500 Internal Server Error en excepciones
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateReserve(
             @PathVariable Integer id,
             @RequestBody ReserveCommand cmd
     ) {
-        // Validación básica de campos
         if (cmd.getUserId() == null
                 || cmd.getRoomId() == null
                 || cmd.getStatus() == null || cmd.getStatus().isBlank()
@@ -142,12 +138,10 @@ public class ReserveController {
                     .badRequest()
                     .body("Faltan campos obligatorios: userId, roomId, status, startTime, endTime");
         }
-
         try {
             var updated = reserveService.updateReserve(id, cmd);
             return ResponseEntity.ok(new ReserveDto(updated));
         } catch (RuntimeException notFound) {
-            // excepciones lanzadas cuando no existe la reserva
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(notFound.getMessage());
