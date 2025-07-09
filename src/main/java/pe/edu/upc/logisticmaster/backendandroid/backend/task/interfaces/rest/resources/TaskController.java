@@ -1,78 +1,59 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.task.interfaces.rest.resources;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.commandService.TaskCommandService;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.QueryService.TaskQueryService;
-import pe.edu.upc.logisticmaster.backendandroid.backend.worker.internal.queryService.WorkerQueryService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.services.TaskQueryService;
 import pe.edu.upc.logisticmaster.backendandroid.backend.task.transform.TaskDto;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.TaskAggregate;
-import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerAggregate;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
 
-    private final TaskCommandService command;
-    private final TaskQueryService query;
-    private final WorkerQueryService workerQuery;
+    private final TaskQueryService  queryService;
+    private final TaskCommandService commandService;
 
-    public TaskController(TaskCommandService command,
-                          TaskQueryService query,
-                          WorkerQueryService workerQuery) {
-        this.command = command;
-        this.query = query;
-        this.workerQuery = workerQuery;
+    public TaskController(
+            TaskQueryService queryService,
+            TaskCommandService commandService
+    ) {
+        this.queryService  = queryService;
+        this.commandService = commandService;
     }
-
-    private TaskDto toDto(TaskAggregate t) {
-        return new TaskDto(
-                t.getId(),
-                t.getTitulo(),
-                t.getDescripcion(),
-                t.getWorker().getId()
-        );
-    }
-
-    private TaskAggregate toEntity(TaskDto dto) {
-        WorkerAggregate w = workerQuery.findById(dto.getWorkerId());
-        return new TaskAggregate(
-                dto.getId(),
-                dto.getTitulo(),
-                dto.getDescripcion(),
-                w
-        );
-    }
-
 
     @GetMapping
-    public List<TaskDto> list() {
-        return query.findAll().stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public List<TaskDto> getAll() {
+        return queryService.getAll();
     }
 
     @GetMapping("/{id}")
-    public TaskDto get(@PathVariable Long id) {
-        return toDto(query.findById(id));
+    public TaskDto getById(@PathVariable Long id) {
+        return queryService.getById(id);
+    }
+
+    @GetMapping("/worker/{workerId}")
+    public List<TaskDto> getByWorker(@PathVariable Long workerId) {
+        return queryService.getByWorkerId(workerId);
     }
 
     @PostMapping
     public TaskDto create(@RequestBody TaskDto dto) {
-        TaskAggregate saved = command.create(toEntity(dto));
-        return toDto(saved);
+        return commandService.create(dto);
     }
 
     @PutMapping("/{id}")
-    public TaskDto update(@PathVariable Long id, @RequestBody TaskDto dto) {
-        TaskAggregate updated = command.update(id, toEntity(dto));
-        return toDto(updated);
+    public TaskDto update(
+            @PathVariable Long id,
+            @RequestBody TaskDto dto
+    ) {
+        return commandService.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        command.delete(id);
+        commandService.delete(id);
     }
 }

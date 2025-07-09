@@ -1,16 +1,13 @@
-package pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.QueryService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.TaskAggregate;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.repositories.TaskRepository;
+package pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.services;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.TaskAggregate;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.repositories.TaskRepository;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.transform.TaskDto;
 
 @Service
-
 public class TaskQueryService {
 
     private final TaskRepository repo;
@@ -19,12 +16,24 @@ public class TaskQueryService {
         this.repo = repo;
     }
 
-    public List<TaskAggregate> findAll() {
-        return repo.findAll();
+    /** Todas las tareas */
+    public List<TaskDto> getAll() {
+        return repo.findAll().stream()
+                .map(TaskAggregate::toDto)
+                .collect(Collectors.toList());
     }
 
-    public TaskAggregate findById(Long id) {
+    /** Tarea por ID */
+    public TaskDto getById(Long id) {
         return repo.findById(id)
+                .map(TaskAggregate::toDto)
                 .orElseThrow(() -> new RuntimeException("Tarea no encontrada: " + id));
+    }
+
+    /** Tareas por Worker ID */
+    public List<TaskDto> getByWorkerId(Long workerId) {
+        return repo.findByWorkerId(workerId).stream()
+                .map(TaskAggregate::toDto)
+                .collect(Collectors.toList());
     }
 }

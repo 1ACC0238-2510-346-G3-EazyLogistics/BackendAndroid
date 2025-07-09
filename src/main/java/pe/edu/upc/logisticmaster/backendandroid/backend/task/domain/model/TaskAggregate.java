@@ -1,71 +1,50 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model;
 
-import jakarta.persistence.*;
-import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerAggregate;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.transform.TaskDto;
 
 @Entity
 @Table(name = "task")
 public class TaskAggregate {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String titulo;
-
     private String descripcion;
+    private Long workerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "empleado_id", nullable = false)
-    private WorkerAggregate worker;
+    public TaskAggregate() { }
 
-    protected TaskAggregate() { }
+    public TaskAggregate(Long id, String titulo, String descripcion, Long workerId) {
+        this.id = id;
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.workerId = workerId;
+    }
+
+    public Long getId() { return id; }
+    public String getTitulo() { return titulo; }
+    public String getDescripcion() { return descripcion; }
+    public Long getWorkerId() { return workerId; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public void setWorkerId(Long workerId) { this.workerId = workerId; }
 
     /**
-     * Constructor que coincide con toEntity(dto).
-     * El primer parámetro puede ser null para creación (JPA lo ignorará y generará uno nuevo).
+     * Convierte este aggregate a DTO para transporte JSON
      */
-    public TaskAggregate(Long id,
-                         String titulo,
-                         String descripcion,
-                         WorkerAggregate worker) {
-        this.id = id;
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.worker = worker;
-    }
-
-    // --- Getters & setters manuales ---
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public WorkerAggregate getWorker() {
-        return worker;
-    }
-
-    public void setWorker(WorkerAggregate worker) {
-        this.worker = worker;
+    public TaskDto toDto() {
+        return new TaskDto(
+                this.id,
+                this.titulo,
+                this.descripcion,
+                this.workerId
+        );
     }
 }
