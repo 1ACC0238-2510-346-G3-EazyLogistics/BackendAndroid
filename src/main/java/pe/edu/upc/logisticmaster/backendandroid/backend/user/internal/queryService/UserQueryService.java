@@ -1,6 +1,5 @@
-package pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.services;
+package pe.edu.upc.logisticmaster.backendandroid.backend.user.internal.queryService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model.UserAggregate;
 import pe.edu.upc.logisticmaster.backendandroid.backend.user.repositories.UserRepository;
@@ -8,36 +7,18 @@ import pe.edu.upc.logisticmaster.backendandroid.backend.user.repositories.UserRe
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserQueryService {
 
     private final UserRepository repo;
 
-    public UserService(UserRepository repo) {
+    public UserQueryService(UserRepository repo) {
         this.repo = repo;
     }
 
-    // CREACIÓN
-    public UserAggregate create(UserAggregate u) {
-        return repo.save(u);
-    }
-
-    // ACTUALIZACIÓN
-    public UserAggregate update(Long id, UserAggregate u) {
-        u.setId(id);
-        return repo.save(u);
-    }
-
-    // ELIMINACIÓN
-    public void delete(Long id) {
-        repo.deleteById(id);
-    }
-
-    // LECTURA TODOS
     public List<UserAggregate> findAll() {
         return repo.findAll();
     }
 
-    // LECTURA POR ID
     public UserAggregate findById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + id));

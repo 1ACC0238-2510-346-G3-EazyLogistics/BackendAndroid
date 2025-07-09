@@ -1,100 +1,55 @@
-// src/main/java/pe/edu/upc/logisticmaster/backendandroid/backend/worker/domain/model/WorkerAggregate.java
 package pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.Task;
-import pe.edu.upc.logisticmaster.backendandroid.backend.login.auth.domain.model.AuthAggregate;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.TaskAggregate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "worker_aggregate")
+@Table(name = "worker")
 public class WorkerAggregate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    // Clave natural para enlazar con AuthAggregate
-    @Column(unique = true, nullable = false)
+    private String nombre;
+    private String apellido;
     private String email;
+    private String telefono;
+    private String puesto;
+    private String area;
 
-    private String name;
-    private String position;
-    private boolean isActive;
+    @OneToMany(mappedBy = "worker", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskAggregate> tasks = new ArrayList<>();
 
-    // FK worker_aggregate.email → auth_aggregate.email
-    @OneToOne
-    @JoinColumn(
-            name = "email",
-            referencedColumnName = "email",
-            insertable = false,
-            updatable = false
-    )
-    private AuthAggregate authAggregate;
+    protected WorkerAggregate() { }
 
-    @ManyToMany
-    @JoinTable(
-            name = "worker_task",
-            joinColumns = @JoinColumn(name = "worker_id"),
-            inverseJoinColumns = @JoinColumn(name = "task_id")
-    )
-    private Set<Task> tasks = new HashSet<>();
-
-    public WorkerAggregate() {}
-
-    public WorkerAggregate(String email, String name, String position, boolean isActive) {
-        this.email    = email;
-        this.name     = name;
-        this.position = position;
-        this.isActive = isActive;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
+    public WorkerAggregate(Long id, String nombre, String apellido, String email,
+                           String telefono, String puesto, String area) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
         this.email = email;
+        this.telefono = telefono;
+        this.puesto = puesto;
+        this.area = area;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public AuthAggregate getAuthAggregate() {
-        return authAggregate;
-    }
-
-    public Set<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(Set<Task> tasks) {
-        this.tasks = tasks;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public List<TaskAggregate> getTasks() { return tasks; }
+    public void setTasks(List<TaskAggregate> tasks) { this.tasks = tasks; }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getApellido() { return apellido; }
+    public void setApellido(String apellido) { this.apellido = apellido; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getPuesto() { return puesto; }
+    public void setPuesto(String puesto) { this.puesto = puesto; }
+    public String getArea() { return area; }
+    public void setArea(String area) { this.area = area; }
 }

@@ -2,22 +2,29 @@ package pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.commandSe
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.Task;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.services.TaskService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.TaskAggregate;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.repositories.TaskRepository;
+
 
 @Service
 public class TaskCommandService {
 
-    @Autowired
-    private TaskService taskService;
+    private final TaskRepository repo;
 
-    // Crear o actualizar una tarea
-    public void executeCreateTask(Task task) {
-        taskService.createTask(task);
+    public TaskCommandService(TaskRepository repo) {
+        this.repo = repo;
     }
 
-    // Eliminar tarea por ID
-    public void executeDeleteTask(Long id) {
-        taskService.deleteTask(id);
+    public TaskAggregate create(TaskAggregate t) {
+        return repo.save(t);
+    }
+
+    public TaskAggregate update(Long id, TaskAggregate t) {
+        t.setId(id);
+        return repo.save(t);
+    }
+
+    public void delete(Long id) {
+        repo.deleteById(id);
     }
 }

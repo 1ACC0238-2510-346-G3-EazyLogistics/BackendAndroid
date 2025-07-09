@@ -2,27 +2,29 @@ package pe.edu.upc.logisticmaster.backendandroid.backend.worker.internal.command
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerCommand;
-import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerAggregate;
+import pe.edu.upc.logisticmaster.backendandroid.backend.worker.repositories.WorkerRepository;
+
 
 @Service
 public class WorkerCommandService {
 
-    @Autowired
-    private WorkerService workerService;
+    private final WorkerRepository repo;
 
-    // Método para crear un nuevo trabajador
-    public void executeCreateWorker(WorkerCommand workerCommand) {
-        workerService.createWorker(workerCommand);
+    public WorkerCommandService(WorkerRepository repo) {
+        this.repo = repo;
     }
 
-    // Método para actualizar un trabajador
-    public void executeUpdateWorker(Long id, WorkerCommand workerCommand) {
-        workerService.updateWorker(id, workerCommand);
+    public WorkerAggregate create(WorkerAggregate w) {
+        return repo.save(w);
     }
 
-    // Método para eliminar un trabajador
-    public void executeDeleteWorker(Long id) {
-        workerService.deleteWorker(id);
+    public WorkerAggregate update(Long id, WorkerAggregate w) {
+        w.setId(id);
+        return repo.save(w);
+    }
+
+    public void delete(Long id) {
+        repo.deleteById(id);
     }
 }

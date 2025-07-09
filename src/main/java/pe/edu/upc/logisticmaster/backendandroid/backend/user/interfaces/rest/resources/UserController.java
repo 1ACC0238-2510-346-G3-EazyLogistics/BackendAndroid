@@ -1,124 +1,75 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.user.interfaces.rest.resources;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model.User;
-import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.services.UserService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.internal.commandService.UserCommandService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.internal.queryService.UserQueryService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.transform.UserDto;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model.UserAggregate;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserCommandService command;
+    private final UserQueryService query;
 
-    /**
-     * POST /users
-     * – 201 Created con mensaje
-     * – 400 Bad Request si faltan campos obligatorios
-     * – 500 Internal Server Error en errores inesperados
-     */
-    @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) {
-        if (user == null
-                || user.getName() == null || user.getName().isBlank()
-                || user.getEmail() == null || user.getEmail().isBlank()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Faltan campos obligatorios: name, email");
-        }
-        try {
-            userService.createUser(user);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body("User created successfully");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al crear el usuario");
-        }
+    public UserController(UserCommandService command, UserQueryService query) {
+        this.command = command;
+        this.query = query;
     }
 
-    /**
-     * GET /users/{email}
-     * – 200 OK con el usuario
-     * – 400 Bad Request si email es inválido
-     * – 404 Not Found si no existe
-     * – 500 Internal Server Error en errores inesperados
-     */
-    @GetMapping("/{email}")
-    public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
-        if (email == null || email.isBlank()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("El parámetro 'email' es obligatorio");
-        }
-        try {
-            User user = userService.getUserByEmail(email);
-            if (user == null) {
-                return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .body("Usuario con email '" + email + "' no encontrado");
-            }
-            return ResponseEntity.ok(user);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al obtener el usuario");
-        }
+    private UserDto toDto(UserAggregate u) {
+        return new UserDto(
+                u.getId(),
+                u.getNombre(),
+                u.getApellido(),
+                u.getUsuario(),
+                u.getEmail(),
+                u.getContraseña()
+        );
     }
 
-    /**
-     * GET /users
-     * – 200 OK con lista de usuarios
-     * – 500 Internal Server Error en errores inesperados
-     */
+    private UserAggregate toEntity(UserDto dto) {
+        return new UserAggregate(
+                dto.getId(),
+                dto.getNombre(),
+                dto.getApellido(),
+                dto.getUsuario(),
+                dto.getEmail(),
+                dto.getContraseña()
+        );
+    }
+
     @GetMapping
-    public ResponseEntity<?> getAllUsers() {
-        try {
-            List<User> users = userService.getAllUsers();
-            return ResponseEntity.ok(users);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al listar usuarios");
-        }
+    public List<UserDto> list() {
+        return query.findAll()
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * DELETE /users/{id}
-     * – 200 OK si se elimina
-     * – 404 Not Found si no existe
-     * – 500 Internal Server Error en errores inesperados
-     */
+    @GetMapping("/{id}")
+    public UserDto get(@PathVariable Long id) {
+        return toDto(query.findById(id));
+    }
+
+    @PostMapping
+    public UserDto create(@RequestBody UserDto dto) {
+        UserAggregate saved = command.create(toEntity(dto));
+        return toDto(saved);
+    }
+
+    @PutMapping("/{id}")
+    public UserDto update(@PathVariable Long id, @RequestBody UserDto dto) {
+        UserAggregate updated = command.update(id, toEntity(dto));
+        return toDto(updated);
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        if (id == null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("El parámetro 'id' es obligatorio");
-        }
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok("User deleted successfully");
-        } catch (EmptyResultDataAccessException notFound) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Usuario con ID " + id + " no encontrado");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al eliminar el usuario");
-        }
+    public void delete(@PathVariable Long id) {
+        command.delete(id);
     }
 }

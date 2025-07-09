@@ -3,34 +3,28 @@ package pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.QueryServ
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.services.TaskService;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.interfaces.rest.transform.TaskDto;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.TaskAggregate;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.repositories.TaskRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+
 public class TaskQueryService {
 
-    @Autowired
-    private TaskService taskService;
+    private final TaskRepository repo;
 
-    public TaskDto getTaskById(Long id) {
-        var task = taskService.getTaskById(id);
-        if (task == null) {
-            throw new RuntimeException("Tarea no encontrada con ID " + id);
-        }
-        return new TaskDto(task);
+    public TaskQueryService(TaskRepository repo) {
+        this.repo = repo;
     }
 
-    public List<TaskDto> getAllTasks() {
-        return taskService.getAllTasks()
-                .stream()
-                .map(TaskDto::new)
-                .collect(Collectors.toList());
+    public List<TaskAggregate> findAll() {
+        return repo.findAll();
     }
 
-    public void deleteTask(Long id) {
-        taskService.deleteTask(id);
+    public TaskAggregate findById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tarea no encontrada: " + id));
     }
 }

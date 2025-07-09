@@ -1,61 +1,84 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.worker.interfaces.rest.transform;
 
-import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerAggregate;
+import java.util.List;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.transform.TaskDto;
 
 public class WorkerDto {
     private Long id;
-    private String name;
+    private String nombre;
+    private String apellido;
     private String email;
-    private String position;
-    private boolean isActive;
+    private String telefono;
+    private String puesto;
+    private String area;
+    private List<TaskDto> tasks;
 
-    // Constructor a partir de WorkerAggregate
-    public WorkerDto(WorkerAggregate worker) {
-        this.id = worker.getId();
-        this.name = worker.getName();
-        this.email = worker.getEmail();
-        this.position = worker.getPosition();
-        this.isActive = worker.isActive();
+    public WorkerDto() { }
+
+    public WorkerDto(Long id,
+                     String nombre,
+                     String apellido,
+                     String email,
+                     String telefono,
+                     String puesto,
+                     String area,
+                     List<TaskDto> tasks) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.email = email;
+        this.telefono = telefono;
+        this.puesto = puesto;
+        this.area = area;
+        this.tasks = tasks;
     }
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
-    public String getName() {
-        return name;
+    public String getNombre() {
+        return nombre;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
-
+    public String getApellido() {
+        return apellido;
+    }
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
     public String getEmail() {
         return email;
     }
-
     public void setEmail(String email) {
         this.email = email;
     }
-
-    public String getPosition() {
-        return position;
+    public String getTelefono() {
+        return telefono;
     }
-
-    public void setPosition(String position) {
-        this.position = position;
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
-
-    public boolean isActive() {
-        return isActive;
+    public String getPuesto() {
+        return puesto;
     }
-
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setPuesto(String puesto) {
+        this.puesto = puesto;
+    }
+    public String getArea() {
+        return area;
+    }
+    public void setArea(String area) {
+        this.area = area;
+    }
+    public List<TaskDto> getTasks() {
+        return tasks;
+    }
+    public void setTasks(List<TaskDto> tasks) {
+        this.tasks = tasks;
     }
 }

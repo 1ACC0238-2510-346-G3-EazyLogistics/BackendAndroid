@@ -1,83 +1,78 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.task.interfaces.rest.resources;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.commandService.TaskCommandService;
 import pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.QueryService.TaskQueryService;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.interfaces.rest.transform.TaskDto;
+import pe.edu.upc.logisticmaster.backendandroid.backend.worker.internal.queryService.WorkerQueryService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.transform.TaskDto;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.model.TaskAggregate;
+import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerAggregate;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/api/tasks")
 public class TaskController {
 
-    @Autowired
-    private TaskQueryService taskQueryService;
+    private final TaskCommandService command;
+    private final TaskQueryService query;
+    private final WorkerQueryService workerQuery;
 
-    /**
-     * GET /tasks/{id}
-     * – 200 OK con TaskDto (incluye lista de WorkerDto)
-     * – 404 Not Found si no existe la tarea
-     * – 500 Internal Server Error en errores inesperados
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getTaskById(@PathVariable Long id) {
-        try {
-            TaskDto dto = taskQueryService.getTaskById(id);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException notFound) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(notFound.getMessage());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al obtener la tarea");
-        }
+    public TaskController(TaskCommandService command,
+                          TaskQueryService query,
+                          WorkerQueryService workerQuery) {
+        this.command = command;
+        this.query = query;
+        this.workerQuery = workerQuery;
     }
 
-    /**
-     * GET /tasks
-     * – 200 OK con lista de TaskDto
-     * – 500 Internal Server Error en errores inesperados
-     */
+    private TaskDto toDto(TaskAggregate t) {
+        return new TaskDto(
+                t.getId(),
+                t.getTitulo(),
+                t.getDescripcion(),
+                t.getWorker().getId()
+        );
+    }
+
+    private TaskAggregate toEntity(TaskDto dto) {
+        WorkerAggregate w = workerQuery.findById(dto.getWorkerId());
+        return new TaskAggregate(
+                dto.getId(),
+                dto.getTitulo(),
+                dto.getDescripcion(),
+                w
+        );
+    }
+
+
     @GetMapping
-    public ResponseEntity<?> getAllTasks() {
-        try {
-            List<TaskDto> all = taskQueryService.getAllTasks();
-            return ResponseEntity.ok(all);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al listar tareas");
-        }
+    public List<TaskDto> list() {
+        return query.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * DELETE /tasks/{id}
-     * – 200 OK si se elimina correctamente
-     * – 404 Not Found si no existe la tarea
-     * – 500 Internal Server Error en errores inesperados
-     */
+    @GetMapping("/{id}")
+    public TaskDto get(@PathVariable Long id) {
+        return toDto(query.findById(id));
+    }
+
+    @PostMapping
+    public TaskDto create(@RequestBody TaskDto dto) {
+        TaskAggregate saved = command.create(toEntity(dto));
+        return toDto(saved);
+    }
+
+    @PutMapping("/{id}")
+    public TaskDto update(@PathVariable Long id, @RequestBody TaskDto dto) {
+        TaskAggregate updated = command.update(id, toEntity(dto));
+        return toDto(updated);
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
-        try {
-            taskQueryService.deleteTask(id);
-            return ResponseEntity.ok("Tarea eliminada correctamente");
-        } catch (RuntimeException notFound) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(notFound.getMessage());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al eliminar la tarea");
-        }
+    public void delete(@PathVariable Long id) {
+        command.delete(id);
     }
 }

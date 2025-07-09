@@ -1,50 +1,38 @@
-package pe.edu.upc.logisticmaster.backendandroid.backend.reserve.domain.model;
+package pe.edu.upc.logisticmaster.backendandroid.backend.reserve.interfaces.rest.resources;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.CreationTimestamp;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-@Entity
-@Table(name = "reserve")
-public class ReserveAggregate {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ReserveDto {
     private Long id;
-
-    @Column(name = "nombre_huespedes", nullable = false)
     private String nombreHuespedes;
-
-    @Column(name = "habitacion", nullable = false)
     private String habitacion;
-
-    @Column(name = "hora_ingreso", nullable = false)
     private String horaIngreso;
-
-    @Column(name = "hora_salida", nullable = false)
     private String horaSalida;
 
-    /** Se ignora en INSERT/UPDATE desde la app */
-    @CreationTimestamp
-    @Column(name = "fecha_creacion", updatable = false)
+    /** Solo de salida, no lo envía el cliente */
+    @JsonProperty(value = "fechaCreacion", access = Access.READ_ONLY)
     private LocalDateTime fechaCreacion;
 
-    protected ReserveAggregate() { }
+    public ReserveDto() { }
 
-    /** Constructor SIN fechaCreacion: se genera automáticamente */
-    public ReserveAggregate(Long id,
-                            String nombreHuespedes,
-                            String habitacion,
-                            String horaIngreso,
-                            String horaSalida) {
+    /** Constructor completo de salida */
+    public ReserveDto(Long id,
+                      String nombreHuespedes,
+                      String habitacion,
+                      String horaIngreso,
+                      String horaSalida,
+                      LocalDateTime fechaCreacion) {
         this.id = id;
         this.nombreHuespedes = nombreHuespedes;
         this.habitacion = habitacion;
         this.horaIngreso = horaIngreso;
         this.horaSalida = horaSalida;
+        this.fechaCreacion = fechaCreacion;
     }
 
-    // getters y setters (incluye getFechaCreacion, no setter)
+    // getters & setters (sin setFechaCreacion)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

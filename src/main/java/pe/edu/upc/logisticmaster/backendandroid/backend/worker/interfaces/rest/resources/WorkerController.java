@@ -1,151 +1,90 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.worker.interfaces.rest.resources;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import pe.edu.upc.logisticmaster.backendandroid.backend.worker.internal.commandService.WorkerCommandService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.worker.internal.queryService.WorkerQueryService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.worker.interfaces.rest.transform.WorkerDto;
 import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerAggregate;
-import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerCommand;
-import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.transform.TaskDto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/workers")
+@RequestMapping("/api/workers")
 public class WorkerController {
 
-    @Autowired
-    private WorkerService workerService;
+    private final WorkerCommandService command;
+    private final WorkerQueryService query;
 
-    /**
-     * POST /workers
-     * – 201 Created si se crea correctamente
-     * – 400 Bad Request si faltan campos obligatorios
-     * – 500 Internal Server Error en errores inesperados
-     */
-    @PostMapping
-    public ResponseEntity<?> createWorker(@RequestBody WorkerCommand cmd) {
-        if (cmd.getName() == null || cmd.getName().isBlank()
-                || cmd.getPosition() == null || cmd.getPosition().isBlank()
-                || cmd.getEmail() == null || cmd.getEmail().isBlank()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Faltan campos obligatorios: name, position, email");
-        }
-        try {
-            WorkerAggregate created = workerService.createWorker(cmd);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(created);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al crear el trabajador");
-        }
+    public WorkerController(WorkerCommandService command,
+                            WorkerQueryService query) {
+        this.command = command;
+        this.query = query;
     }
 
-    /**
-     * GET /workers/{id}
-     * – 200 OK con el WorkerAggregate
-     * – 404 Not Found si no existe
-     * – 500 Internal Server Error en errores inesperados
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getWorkerById(@PathVariable Long id) {
-        try {
-            WorkerAggregate worker = workerService.getWorkerById(id);
-            if (worker == null) {
-                return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .body("Trabajador con ID " + id + " no encontrado");
-            }
-            return ResponseEntity.ok(worker);
-        } catch (RuntimeException notFound) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(notFound.getMessage());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al obtener el trabajador");
-        }
+    private WorkerDto toDto(WorkerAggregate w) {
+        List<TaskDto> ts = w.getTasks().stream()
+                .map(t -> new TaskDto(
+                        t.getId(),
+                        t.getTitulo(),
+                        t.getDescripcion(),
+                        w.getId()
+                ))
+                .collect(Collectors.toList());
+
+        return new WorkerDto(
+                w.getId(),
+                w.getNombre(),
+                w.getApellido(),
+                w.getEmail(),
+                w.getTelefono(),
+                w.getPuesto(),
+                w.getArea(),
+                ts
+        );
     }
 
-    /**
-     * GET /workers
-     * – 200 OK con lista de WorkerAggregate
-     * – 500 Internal Server Error en errores inesperados
-     */
+    private WorkerAggregate toEntity(WorkerDto dto) {
+        WorkerAggregate w = new WorkerAggregate(
+                dto.getId(),
+                dto.getNombre(),
+                dto.getApellido(),
+                dto.getEmail(),
+                dto.getTelefono(),
+                dto.getPuesto(),
+                dto.getArea()
+        );
+        // las tasks se gestionan por separado vía TaskController
+        return w;
+    }
+
     @GetMapping
-    public ResponseEntity<?> getAllWorkers() {
-        try {
-            List<WorkerAggregate> list = workerService.getAllWorkers();
-            return ResponseEntity.ok(list);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al listar trabajadores");
-        }
+    public List<WorkerDto> list() {
+        return query.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * PUT /workers/{id}
-     * – 200 OK si se actualiza correctamente
-     * – 400 Bad Request si faltan campos obligatorios
-     * – 404 Not Found si no existe
-     * – 500 Internal Server Error en errores inesperados
-     */
+    @GetMapping("/{id}")
+    public WorkerDto get(@PathVariable Long id) {
+        return toDto(query.findById(id));
+    }
+
+    @PostMapping
+    public WorkerDto create(@RequestBody WorkerDto dto) {
+        WorkerAggregate saved = command.create(toEntity(dto));
+        return toDto(saved);
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateWorker(
-            @PathVariable Long id,
-            @RequestBody WorkerCommand cmd
-    ) {
-        if (cmd.getName() == null || cmd.getName().isBlank()
-                || cmd.getPosition() == null || cmd.getPosition().isBlank()
-                || cmd.getEmail() == null || cmd.getEmail().isBlank()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Faltan campos obligatorios: name, position, email");
-        }
-        try {
-            WorkerAggregate updated = workerService.updateWorker(id, cmd);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException notFound) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(notFound.getMessage());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al actualizar el trabajador");
-        }
+    public WorkerDto update(@PathVariable Long id, @RequestBody WorkerDto dto) {
+        WorkerAggregate updated = command.update(id, toEntity(dto));
+        return toDto(updated);
     }
 
-    /**
-     * DELETE /workers/{id}
-     * – 200 OK si se elimina correctamente
-     * – 404 Not Found si no existe
-     * – 500 Internal Server Error en errores inesperados
-     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteWorker(@PathVariable Long id) {
-        try {
-            workerService.deleteWorker(id);
-            return ResponseEntity.ok("Trabajador eliminado correctamente");
-        } catch (RuntimeException notFound) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(notFound.getMessage());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error interno al eliminar el trabajador");
-        }
+    public void delete(@PathVariable Long id) {
+        command.delete(id);
     }
 }
