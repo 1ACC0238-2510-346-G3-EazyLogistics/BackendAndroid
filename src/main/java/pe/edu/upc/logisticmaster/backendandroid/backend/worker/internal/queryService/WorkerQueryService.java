@@ -1,6 +1,8 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.worker.internal.queryService;
 
 import org.springframework.stereotype.Service;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model.UserAggregate;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.transform.UserDto;
 import pe.edu.upc.logisticmaster.backendandroid.backend.worker.domain.model.WorkerAggregate;
 import pe.edu.upc.logisticmaster.backendandroid.backend.worker.interfaces.rest.transform.WorkerDto;
 import pe.edu.upc.logisticmaster.backendandroid.backend.worker.repositories.WorkerRepository;
@@ -43,4 +45,5 @@ public class WorkerQueryService {
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado: " + id));
         return agg.toDto();
     }
+
 }
