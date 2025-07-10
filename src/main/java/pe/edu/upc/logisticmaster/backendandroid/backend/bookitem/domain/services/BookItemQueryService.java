@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.bookitem.domain.services;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.logisticmaster.backendandroid.backend.bookitem.domain.model.BookItemAggregate;
 import pe.edu.upc.logisticmaster.backendandroid.backend.bookitem.repositories.BookItemRepository;
@@ -11,14 +10,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class BookItemQueryService {
 
     private final BookItemRepository repo;
 
+    public BookItemQueryService(BookItemRepository repo) {
+        this.repo = repo;
+    }
+
     public BookItemDto findById(Long id) {
         BookItemAggregate agg = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found: " + id));
         return toDto(agg);
     }
 
@@ -34,14 +36,12 @@ public class BookItemQueryService {
                 .collect(Collectors.toList());
     }
 
-    /** new: todas las reservas de un hotel concreto */
     public List<BookItemDto> findByHotelId(Long hotelId) {
         return repo.findByHotelId(hotelId).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
-    /** new: reservas cuyo checkInDate esté entre from y to */
     public List<BookItemDto> findByCheckInBetween(LocalDateTime from, LocalDateTime to) {
         return repo.findByCheckInDateBetween(from, to).stream()
                 .map(this::toDto)
@@ -49,26 +49,26 @@ public class BookItemQueryService {
     }
 
     private BookItemDto toDto(BookItemAggregate agg) {
-        return BookItemDto.builder()
-                .id(agg.getId())
-                .userId(agg.getUserId())
-                .hotelId(agg.getHotelId())
-                .checkInDate(agg.getCheckInDate())
-                .checkOutDate(agg.getCheckOutDate())
-                .adults(agg.getAdults())
-                .children(agg.getChildren())
-                .infants(agg.getInfants())
-                .nights(agg.getNights())
-                .isPaid(agg.getIsPaid())
-                .bookingDate(agg.getBookingDate())
-                .hotelName(agg.getHotelName())
-                .hotelImage(agg.getHotelImage())
-                .location(agg.getLocation())
-                .pricePerNight(agg.getPricePerNight())
-                .taxes(agg.getTaxes())
-                .totalPrice(agg.getTotalPrice())
-                .paymentMethod(agg.getPaymentMethod())
-                .status(agg.getStatus())
-                .build();
+        BookItemDto dto = new BookItemDto();
+        dto.setId(agg.getId());
+        dto.setUserId(agg.getUserId());
+        dto.setHotelId(agg.getHotelId());
+        dto.setCheckInDate(agg.getCheckInDate());
+        dto.setCheckOutDate(agg.getCheckOutDate());
+        dto.setAdults(agg.getAdults());
+        dto.setChildren(agg.getChildren());
+        dto.setInfants(agg.getInfants());
+        dto.setNights(agg.getNights());
+        dto.setIsPaid(agg.getIsPaid());
+        dto.setBookingDate(agg.getBookingDate());
+        dto.setHotelName(agg.getHotelName());
+        dto.setHotelImage(agg.getHotelImage());
+        dto.setLocation(agg.getLocation());
+        dto.setPricePerNight(agg.getPricePerNight());
+        dto.setTaxes(agg.getTaxes());
+        dto.setTotalPrice(agg.getTotalPrice());
+        dto.setPaymentMethod(agg.getPaymentMethod());
+        dto.setStatus(agg.getStatus());
+        return dto;
     }
 }

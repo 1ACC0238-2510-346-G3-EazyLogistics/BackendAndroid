@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.paymentmethod.resources;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.logisticmaster.backendandroid.backend.paymentmethod.transform.PaymentMethodDto;
@@ -11,13 +10,21 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 public class PaymentMethodController {
 
     private final PaymentMethodCommandService command;
     private final PaymentMethodQueryService query;
 
-    // — CRUD por usuario
+    public PaymentMethodController(
+            PaymentMethodCommandService command,
+            PaymentMethodQueryService query
+    ) {
+        this.command = command;
+        this.query = query;
+    }
+
+    // CRUD por usuario
+
     @GetMapping("/users/{userId}/payment-methods")
     public List<PaymentMethodDto> listByUser(@PathVariable Long userId) {
         return query.findByUserId(userId);
@@ -62,16 +69,16 @@ public class PaymentMethodController {
         return ResponseEntity.noContent().build();
     }
 
-    // — Endpoints globales
+    // Endpoints globales
 
     @GetMapping("/payment-methods")
     public List<PaymentMethodDto> listAll() {
         return query.findAll();
     }
 
-    // — Operaciones por usuario
+    // Operaciones especiales
 
-    /** Obtener mtodo por defecto */
+    /** Obtener método por defecto */
     @GetMapping("/users/{userId}/payment-methods/default")
     public PaymentMethodDto getDefault(@PathVariable Long userId) {
         return query.findDefaultByUserId(userId);
@@ -86,7 +93,7 @@ public class PaymentMethodController {
         return ResponseEntity.ok(command.setDefault(userId, id));
     }
 
-    /** Comprueba si existe para este usuario */
+    /** Comprueba existencia para este usuario */
     @GetMapping("/users/{userId}/payment-methods/{id}/exists")
     public ResponseEntity<Boolean> exists(
             @PathVariable Long userId,

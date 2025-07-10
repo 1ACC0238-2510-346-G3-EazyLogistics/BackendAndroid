@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.resena.domain.services;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.logisticmaster.backendandroid.backend.resena.domain.model.ReviewAggregate;
 import pe.edu.upc.logisticmaster.backendandroid.backend.resena.repositories.ReviewRepository;
@@ -11,9 +10,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class ReviewQueryService {
+
     private final ReviewRepository repo;
+
+    public ReviewQueryService(ReviewRepository repo) {
+        this.repo = repo;
+    }
 
     public ReviewDto findById(Long id) {
         ReviewAggregate agg = repo.findById(id)
@@ -33,8 +36,8 @@ public class ReviewQueryService {
                 .collect(Collectors.toList());
     }
 
-    public List<ReviewDto> findByMinRating(Integer min) {
-        return repo.findByRatingGreaterThanEqual(min).stream()
+    public List<ReviewDto> findByMinRating(Integer minRating) {
+        return repo.findByRatingGreaterThanEqual(minRating).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
@@ -52,17 +55,18 @@ public class ReviewQueryService {
     }
 
     public Double getAverageRating(Long hotelId) {
-        return repo.findAverageRatingByHotelId(hotelId);
+        Double avg = repo.findAverageRatingByHotelId(hotelId);
+        return avg != null ? avg : 0.0;
     }
 
     private ReviewDto toDto(ReviewAggregate agg) {
-        return ReviewDto.builder()
-                .id(agg.getId())
-                .hotelId(agg.getHotelId())
-                .rating(agg.getRating())
-                .comment(agg.getComment())
-                .ratingDate(agg.getRatingDate())
-                .username(agg.getUsername())
-                .build();
+        ReviewDto dto = new ReviewDto();
+        dto.setId(agg.getId());
+        dto.setHotelId(agg.getHotelId());
+        dto.setRating(agg.getRating());
+        dto.setComment(agg.getComment());
+        dto.setRatingDate(agg.getRatingDate());
+        dto.setUsername(agg.getUsername());
+        return dto;
     }
 }

@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.favoritehotel.resources;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.logisticmaster.backendandroid.backend.favoritehotel.transform.FavoriteHotelDto;
@@ -12,13 +11,21 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users/{userId}/favorites")
-@RequiredArgsConstructor
 public class FavoriteHotelController {
 
     private final FavoriteHotelCommandService command;
     private final FavoriteHotelQueryService query;
 
-    // — CRUD por usuario
+    public FavoriteHotelController(
+            FavoriteHotelCommandService command,
+            FavoriteHotelQueryService query
+    ) {
+        this.command = command;
+        this.query = query;
+    }
+
+    // CRUD por usuario
+
     @GetMapping
     public List<FavoriteHotelDto> listByUser(@PathVariable Long userId) {
         return query.findByUserId(userId);
@@ -60,23 +67,20 @@ public class FavoriteHotelController {
         return ResponseEntity.noContent().build();
     }
 
-    // — Operaciones globales
+    // Endpoints globales
 
-    /** Listar todos los favoritos */
     @GetMapping(path = "/../../favorites")
     public List<FavoriteHotelDto> listAll() {
         return query.findAll();
     }
 
-    /** Listar favoritos de un hotel */
     @GetMapping(path = "/../../favorites/hotel/{hotelId}")
     public List<FavoriteHotelDto> listByHotel(@PathVariable Long hotelId) {
         return query.findByHotelId(hotelId);
     }
 
-    // — Operaciones user+hotel
+    // Operaciones user+hotel
 
-    /** Comprobar si el usuario marcó favorito este hotel */
     @GetMapping("/hotel/{hotelId}/exists")
     public ResponseEntity<Boolean> exists(
             @PathVariable Long userId,
@@ -85,7 +89,6 @@ public class FavoriteHotelController {
         return ResponseEntity.ok(query.existsByUserAndHotel(userId, hotelId));
     }
 
-    /** Borrar favorito por (userId, hotelId) */
     @DeleteMapping("/hotel/{hotelId}")
     public ResponseEntity<Void> deleteByUserAndHotel(
             @PathVariable Long userId,

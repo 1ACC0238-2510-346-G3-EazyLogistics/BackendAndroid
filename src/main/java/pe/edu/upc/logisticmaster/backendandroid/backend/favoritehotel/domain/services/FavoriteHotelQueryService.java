@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.favoritehotel.domain.services;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.logisticmaster.backendandroid.backend.favoritehotel.domain.model.FavoriteHotelAggregate;
 import pe.edu.upc.logisticmaster.backendandroid.backend.favoritehotel.repositories.FavoriteHotelRepository;
@@ -10,10 +9,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class FavoriteHotelQueryService {
 
     private final FavoriteHotelRepository repo;
+
+    public FavoriteHotelQueryService(FavoriteHotelRepository repo) {
+        this.repo = repo;
+    }
 
     public FavoriteHotelDto findById(Long id) {
         FavoriteHotelAggregate agg = repo.findById(id)
@@ -44,15 +46,15 @@ public class FavoriteHotelQueryService {
     }
 
     private FavoriteHotelDto toDto(FavoriteHotelAggregate agg) {
-        return FavoriteHotelDto.builder()
-                .id(agg.getId())
-                .userId(agg.getUserId())
-                .hotelId(agg.getHotelId())
-                .hotelName(agg.getHotelName())
-                .hotelImage(agg.getHotelImage())
-                .hotelLocation(agg.getHotelLocation())
-                .hotelRating(agg.getHotelRating())
-                .hotelPrice(agg.getHotelPrice())
-                .build();
+        FavoriteHotelDto dto = new FavoriteHotelDto();
+        dto.setId(agg.getId());
+        dto.setUserId(agg.getUserId());
+        dto.setHotelId(agg.getHotelId());
+        dto.setHotelName(agg.getHotelName());
+        dto.setHotelImage(agg.getHotelImage());
+        dto.setHotelLocation(agg.getHotelLocation());
+        dto.setHotelRating(agg.getHotelRating());
+        dto.setHotelPrice(agg.getHotelPrice());
+        return dto;
     }
 }

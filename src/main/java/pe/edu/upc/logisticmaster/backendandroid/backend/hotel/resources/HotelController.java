@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.hotel.resources;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.logisticmaster.backendandroid.backend.hotel.transform.HotelDto;
@@ -12,13 +11,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/hotels")
-@RequiredArgsConstructor
 public class HotelController {
 
     private final HotelCommandService command;
     private final HotelQueryService query;
 
-    // CRUD estándar
+    public HotelController(HotelCommandService command, HotelQueryService query) {
+        this.command = command;
+        this.query = query;
+    }
+
+    // CRUD
 
     @GetMapping
     public List<HotelDto> listAll() {
@@ -49,21 +52,18 @@ public class HotelController {
         return ResponseEntity.noContent().build();
     }
 
-    // Endpoints de conveniencia
+    // Conveniencia
 
-    /** Listar por ciudad */
     @GetMapping("/city/{city}")
     public List<HotelDto> byCity(@PathVariable String city) {
         return query.findByCity(city);
     }
 
-    /** Listar solo premium */
     @GetMapping("/premium")
     public List<HotelDto> premium() {
         return query.findPremium();
     }
 
-    /** Buscar por fragmento de nombre */
     @GetMapping("/search")
     public List<HotelDto> searchByName(@RequestParam String name) {
         return query.searchByName(name);

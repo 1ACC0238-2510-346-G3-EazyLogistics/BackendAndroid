@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.hotel.domain.services;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.logisticmaster.backendandroid.backend.hotel.domain.model.HotelAggregate;
 import pe.edu.upc.logisticmaster.backendandroid.backend.hotel.repositories.HotelRepository;
@@ -10,15 +9,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class HotelQueryService {
 
     private final HotelRepository repo;
 
+    public HotelQueryService(HotelRepository repo) {
+        this.repo = repo;
+    }
+
     public HotelDto findById(Long id) {
-        return repo.findById(id)
-                .map(this::toDto)
+        HotelAggregate agg = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Hotel not found: " + id));
+        return toDto(agg);
     }
 
     public List<HotelDto> findAll() {
@@ -46,20 +48,20 @@ public class HotelQueryService {
     }
 
     private HotelDto toDto(HotelAggregate agg) {
-        return HotelDto.builder()
-                .id(agg.getId())
-                .name(agg.getName())
-                .description(agg.getDescription())
-                .features(agg.getFeatures())
-                .isPremium(agg.getIsPremium())
-                .latitude(agg.getLatitude())
-                .longitude(agg.getLongitude())
-                .imageUrl(agg.getImageUrl())
-                .city(agg.getCity())
-                .country(agg.getCountry())
-                .address(agg.getAddress())
-                .pricePerNight(agg.getPricePerNight())
-                .rating(agg.getRating())
-                .build();
+        HotelDto dto = new HotelDto();
+        dto.setId(agg.getId());
+        dto.setName(agg.getName());
+        dto.setDescription(agg.getDescription());
+        dto.setFeatures(agg.getFeatures());
+        dto.setIsPremium(agg.getIsPremium());
+        dto.setLatitude(agg.getLatitude());
+        dto.setLongitude(agg.getLongitude());
+        dto.setImageUrl(agg.getImageUrl());
+        dto.setCity(agg.getCity());
+        dto.setCountry(agg.getCountry());
+        dto.setAddress(agg.getAddress());
+        dto.setPricePerNight(agg.getPricePerNight());
+        dto.setRating(agg.getRating());
+        return dto;
     }
 }

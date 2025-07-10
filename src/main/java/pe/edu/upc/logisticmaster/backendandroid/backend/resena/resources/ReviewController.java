@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.resena.resources;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +13,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 public class ReviewController {
 
     private final ReviewCommandService command;
     private final ReviewQueryService query;
 
-    // — CRUD estándar
+    public ReviewController(
+            ReviewCommandService command,
+            ReviewQueryService query
+    ) {
+        this.command = command;
+        this.query = query;
+    }
+
+    // CRUD básico
 
     @GetMapping("/reviews")
     public List<ReviewDto> listAll() {
@@ -57,21 +63,18 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
-    // — Endpoints de conveniencia
+    // Conveniencia
 
-    /** Listar reseñas de un hotel */
     @GetMapping("/hotels/{hotelId}/reviews")
     public List<ReviewDto> byHotel(@PathVariable Long hotelId) {
         return query.findByHotel(hotelId);
     }
 
-    /** Reseñas con rating >= min */
     @GetMapping("/reviews/search/rating")
     public List<ReviewDto> byMinRating(@RequestParam Integer min) {
         return query.findByMinRating(min);
     }
 
-    /** Reseñas entre dos fechas */
     @GetMapping("/reviews/search/date")
     public List<ReviewDto> byDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -82,16 +85,13 @@ public class ReviewController {
         return query.findByDateRange(start, end);
     }
 
-    /** Buscar por palabra en comentario */
     @GetMapping("/reviews/search/comment")
     public List<ReviewDto> searchComment(@RequestParam String text) {
         return query.searchByComment(text);
     }
 
-    /** Promedio de rating de un hotel */
     @GetMapping("/hotels/{hotelId}/reviews/average")
     public ResponseEntity<Double> averageRating(@PathVariable Long hotelId) {
-        Double avg = query.getAverageRating(hotelId);
-        return ResponseEntity.ok(avg != null ? avg : 0.0);
+        return ResponseEntity.ok(query.getAverageRating(hotelId));
     }
 }

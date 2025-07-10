@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.backendandroid.backend.resena.domain.services;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.upc.logisticmaster.backendandroid.backend.resena.domain.model.ReviewAggregate;
@@ -10,20 +9,26 @@ import pe.edu.upc.logisticmaster.backendandroid.backend.resena.transform.ReviewD
 import java.time.LocalDateTime;
 
 @Service
-@RequiredArgsConstructor
 public class ReviewCommandService {
+
     private final ReviewRepository repo;
+
+    public ReviewCommandService(ReviewRepository repo) {
+        this.repo = repo;
+    }
 
     @Transactional
     public ReviewDto create(Long hotelId, ReviewDto dto) {
-        ReviewAggregate agg = ReviewAggregate.builder()
-                .hotelId(hotelId)
-                .rating(dto.getRating())
-                .comment(dto.getComment())
-                .ratingDate(dto.getRatingDate() != null ? dto.getRatingDate() : LocalDateTime.now())
-                .username(dto.getUsername())
-                .build();
+        ReviewAggregate agg = new ReviewAggregate();
+        agg.setHotelId(hotelId);
+        agg.setRating(dto.getRating());
+        agg.setComment(dto.getComment());
+        agg.setRatingDate(dto.getRatingDate() != null
+                ? dto.getRatingDate()
+                : LocalDateTime.now());
+        agg.setUsername(dto.getUsername());
         agg = repo.save(agg);
+
         dto.setId(agg.getId());
         dto.setHotelId(agg.getHotelId());
         dto.setRatingDate(agg.getRatingDate());
@@ -39,6 +44,7 @@ public class ReviewCommandService {
         agg.setRatingDate(dto.getRatingDate());
         agg.setUsername(dto.getUsername());
         repo.save(agg);
+
         dto.setId(agg.getId());
         dto.setHotelId(agg.getHotelId());
         return dto;
