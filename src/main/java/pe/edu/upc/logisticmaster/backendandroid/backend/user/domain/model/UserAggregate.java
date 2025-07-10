@@ -1,61 +1,77 @@
+// src/main/java/pe/edu/upc/logisticmaster/backendandroid/backend/user/domain/model/UserAggregate.java
 package pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import pe.edu.upc.logisticmaster.backendandroid.backend.user.transform.UserDto;
 
 @Entity
 @Table(name = "usuario")
 public class UserAggregate {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nombre;
-    private String apellido;
+
+    @Column(name = "usuario", nullable = false, unique = true)
     private String usuario;
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    private String contraseña;
+
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
+
+    @Column(name = "apellido", nullable = false)
+    private String apellido;
+
+    @Column(name = "contraseña", nullable = false)
+    private String contrasena;
 
     public UserAggregate() {}
 
-    public UserAggregate(Long id, String nombre, String apellido,
-                         String usuario, String email, String contraseña) {
-        this.id         = id;
-        this.nombre     = nombre;
-        this.apellido   = apellido;
-        this.usuario    = usuario;
-        this.email      = email;
-        this.contraseña = contraseña;
+    public UserAggregate(Long id, String usuario, String email, String nombre, String apellido, String contrasena) {
+        this.id = id;
+        this.usuario = usuario;
+        this.email = email;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.contrasena = contrasena;
     }
 
-    // Getters & Setters omitted for brevity…
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getId()           { return id; }
-    public String getNombre()     { return nombre; }
-    public String getApellido()   { return apellido; }
-    public String getUsuario()    { return usuario; }
-    public String getEmail()      { return email; }
-    public String getContraseña() { return contraseña; }
+    public String getUsuario() { return usuario; }
+    public void setUsuario(String usuario) { this.usuario = usuario; }
 
-    public void setId(Long id)               { this.id = id; }
-    public void setNombre(String nombre)     { this.nombre = nombre; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getApellido() { return apellido; }
     public void setApellido(String apellido) { this.apellido = apellido; }
-    public void setUsuario(String usuario)   { this.usuario = usuario; }
-    public void setEmail(String email)       { this.email = email; }
-    public void setContraseña(String c)      { this.contraseña = c; }
 
-    /** Convierte este aggregate a su DTO JSON */
+    public String getContrasena() { return contrasena; }
+    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
+
+    /** Mapea de DTO a Aggregate */
+    public static UserAggregate fromDto(UserDto dto) {
+        return new UserAggregate(
+                dto.getId(),
+                dto.getUsuario(),
+                dto.getEmail(),
+                dto.getNombre(),
+                dto.getApellido(),
+                dto.getContrasena()
+        );
+    }
+
+    /** Mapea de Aggregate a DTO */
     public UserDto toDto() {
         return new UserDto(
-                this.id,
-                this.nombre,
-                this.apellido,
-                this.usuario,
-                this.email,
-                this.contraseña
+                id, usuario, email, nombre, apellido, contrasena
         );
     }
 }

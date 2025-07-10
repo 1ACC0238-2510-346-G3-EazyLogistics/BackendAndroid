@@ -1,12 +1,13 @@
+// src/main/java/pe/edu/upc/logisticmaster/backendandroid/backend/user/internal/queryService/UserQueryService.java
 package pe.edu.upc.logisticmaster.backendandroid.backend.user.internal.queryService;
+
+import org.springframework.stereotype.Service;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model.UserAggregate;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.repositories.UserRepository;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.transform.UserDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import pe.edu.upc.logisticmaster.backendandroid.backend.user.repositories.UserRepository;
-import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model.UserAggregate;
-import pe.edu.upc.logisticmaster.backendandroid.backend.user.transform.UserDto;
 
 @Service
 public class UserQueryService {
@@ -17,24 +18,32 @@ public class UserQueryService {
         this.repo = repo;
     }
 
-    /** Devuelve todos los usuarios como DTO */
-    public List<UserDto> getAll() {
-        return repo.findAll().stream()
+    /** Lista todos los usuarios */
+    public List<UserDto> listAll() {
+        return repo.findAll()
+                .stream()
                 .map(UserAggregate::toDto)
                 .collect(Collectors.toList());
     }
 
-    /** Devuelve un usuario por su ID */
+    /** Busca por ID */
     public UserDto getById(Long id) {
         UserAggregate agg = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + id));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
         return agg.toDto();
     }
 
-    /** Devuelve un usuario por su nombre de usuario (para login) */
+    /** Busca por username */
     public UserDto getByUsuario(String usuario) {
         UserAggregate agg = repo.findByUsuario(usuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + usuario));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con usuario: " + usuario));
+        return agg.toDto();
+    }
+
+    /** Busca por email */
+    public UserDto getByEmail(String email) {
+        UserAggregate agg = repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
         return agg.toDto();
     }
 }

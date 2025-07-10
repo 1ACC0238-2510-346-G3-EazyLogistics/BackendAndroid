@@ -1,45 +1,53 @@
-package pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.services;
+// src/main/java/pe/edu/upc/logisticmaster/backendandroid/backend/user/service/UserService.java
+package pe.edu.upc.logisticmaster.backendandroid.backend.user.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.model.UserAggregate;
-import pe.edu.upc.logisticmaster.backendandroid.backend.user.repositories.UserRepository;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.internal.commandService.UserCommandService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.internal.queryService.UserQueryService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.user.transform.UserDto;
 
 import java.util.List;
 
 @Service
 public class UserService {
 
-    private final UserRepository repo;
+    private final UserQueryService  querySvc;
+    private final UserCommandService commandSvc;
 
-    public UserService(UserRepository repo) {
-        this.repo = repo;
+    public UserService(UserQueryService querySvc, UserCommandService commandSvc) {
+        this.querySvc = querySvc;
+        this.commandSvc = commandSvc;
     }
 
-    // CREACIÓN
-    public UserAggregate create(UserAggregate u) {
-        return repo.save(u);
+    public UserDto create(UserDto dto) {
+        return commandSvc.create(dto);
     }
 
-    // ACTUALIZACIÓN
-    public UserAggregate update(Long id, UserAggregate u) {
-        u.setId(id);
-        return repo.save(u);
+    public List<UserDto> listAll() {
+        return querySvc.listAll();
     }
 
-    // ELIMINACIÓN
+    public UserDto getById(Long id) {
+        return querySvc.getById(id);
+    }
+
+    public UserDto getByUsuario(String usuario) {
+        return querySvc.getByUsuario(usuario);
+    }
+
+    public UserDto getByEmail(String email) {
+        return querySvc.getByEmail(email);
+    }
+
+    public UserDto updateById(UserDto dto) {
+        return commandSvc.updateById(dto);
+    }
+
+    public UserDto updateByEmail(UserDto dto) {
+        return commandSvc.updateByEmail(dto);
+    }
+
     public void delete(Long id) {
-        repo.deleteById(id);
-    }
-
-    // LECTURA TODOS
-    public List<UserAggregate> findAll() {
-        return repo.findAll();
-    }
-
-    // LECTURA POR ID
-    public UserAggregate findById(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + id));
+        commandSvc.delete(id);
     }
 }
