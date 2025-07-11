@@ -17,61 +17,63 @@ public class PaymentMethodController {
 
     public PaymentMethodController(
             PaymentMethodCommandService command,
-            PaymentMethodQueryService query
-    ) {
+            PaymentMethodQueryService query) {
         this.command = command;
         this.query = query;
     }
 
     // CRUD por usuario
 
-    @GetMapping("/users/{userId}/payment-methods")
+    @GetMapping("/api/users/{userId}/payment-methods")
     public List<PaymentMethodDto> listByUser(@PathVariable Long userId) {
         return query.findByUserId(userId);
     }
 
-    @GetMapping("/users/{userId}/payment-methods/{id}")
+    @GetMapping("/api/users/{userId}/payment-methods/{id}")
     public PaymentMethodDto get(
             @PathVariable Long userId,
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         return query.findById(id);
     }
 
-    @PostMapping("/users/{userId}/payment-methods")
+    @PostMapping("/api/users/{userId}/payment-methods")
     public ResponseEntity<PaymentMethodDto> create(
             @PathVariable Long userId,
-            @RequestBody PaymentMethodDto dto
-    ) {
-        dto.setUserId(userId);
-        PaymentMethodDto created = command.create(dto);
-        return ResponseEntity
-                .created(URI.create("/users/" + userId + "/payment-methods/" + created.getId()))
-                .body(created);
+            @RequestBody PaymentMethodDto dto) {
+        try {
+            // Asegurar que el ID sea null para nuevos payment methods
+            dto.setId(null);
+            dto.setUserId(userId);
+            PaymentMethodDto created = command.create(dto);
+            return ResponseEntity
+                    .created(URI.create("/users/" + userId + "/payment-methods/" + created.getId()))
+                    .body(created);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al crear payment method: " + e.getMessage());
+        }
     }
 
-    @PutMapping("/users/{userId}/payment-methods/{id}")
+    @PutMapping("/api/users/{userId}/payment-methods/{id}")
     public PaymentMethodDto update(
             @PathVariable Long userId,
             @PathVariable Long id,
-            @RequestBody PaymentMethodDto dto
-    ) {
+            @RequestBody PaymentMethodDto dto) {
         dto.setUserId(userId);
         return command.update(id, dto);
     }
 
-    @DeleteMapping("/users/{userId}/payment-methods/{id}")
+    @DeleteMapping("/api/users/{userId}/payment-methods/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long userId,
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         command.deleteByUser(userId, id);
         return ResponseEntity.noContent().build();
     }
 
     // Endpoints globales
 
-    @GetMapping("/payment-methods")
+    @GetMapping("/api/payment-methods")
     public List<PaymentMethodDto> listAll() {
         return query.findAll();
     }
@@ -79,26 +81,24 @@ public class PaymentMethodController {
     // Operaciones especiales
 
     /** Obtener método por defecto */
-    @GetMapping("/users/{userId}/payment-methods/default")
+    @GetMapping("/api/users/{userId}/payment-methods/default")
     public PaymentMethodDto getDefault(@PathVariable Long userId) {
         return query.findDefaultByUserId(userId);
     }
 
     /** Marcar uno como por defecto */
-    @PatchMapping("/users/{userId}/payment-methods/{id}/default")
+    @PatchMapping("/api/users/{userId}/payment-methods/{id}/default")
     public ResponseEntity<PaymentMethodDto> setDefault(
             @PathVariable Long userId,
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         return ResponseEntity.ok(command.setDefault(userId, id));
     }
 
     /** Comprueba existencia para este usuario */
-    @GetMapping("/users/{userId}/payment-methods/{id}/exists")
+    @GetMapping("/api/users/{userId}/payment-methods/{id}/exists")
     public ResponseEntity<Boolean> exists(
             @PathVariable Long userId,
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         return ResponseEntity.ok(query.exists(userId, id));
     }
 }

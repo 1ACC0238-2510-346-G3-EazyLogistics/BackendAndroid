@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.commandService.TaskCommandService;
-import pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.services.TaskQueryService;
+import pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.QueryService.TaskQueryService;
 import pe.edu.upc.logisticmaster.backendandroid.backend.task.transform.TaskDto;
 
 @RestController

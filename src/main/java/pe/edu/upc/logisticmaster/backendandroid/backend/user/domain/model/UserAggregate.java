@@ -27,8 +27,10 @@ public class UserAggregate {
     @Column(name = "contraseña", nullable = false)
     private String contrasena;
 
-    public UserAggregate() {}
+    public UserAggregate() {
+    }
 
+    // Constructor con ID (para actualizaciones)
     public UserAggregate(Long id, String usuario, String email, String nombre, String apellido, String contrasena) {
         this.id = id;
         this.usuario = usuario;
@@ -38,23 +40,62 @@ public class UserAggregate {
         this.contrasena = contrasena;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // Constructor sin ID (para nuevos usuarios)
+    public UserAggregate(String usuario, String email, String nombre, String apellido, String contrasena) {
+        this.usuario = usuario;
+        this.email = email;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.contrasena = contrasena;
+    }
 
-    public String getUsuario() { return usuario; }
-    public void setUsuario(String usuario) { this.usuario = usuario; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getUsuario() {
+        return usuario;
+    }
 
-    public String getApellido() { return apellido; }
-    public void setApellido(String apellido) { this.apellido = apellido; }
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
 
-    public String getContrasena() { return contrasena; }
-    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
 
     /** Mapea de DTO a Aggregate */
     public static UserAggregate fromDto(UserDto dto) {
@@ -64,14 +105,22 @@ public class UserAggregate {
                 dto.getEmail(),
                 dto.getNombre(),
                 dto.getApellido(),
-                dto.getContrasena()
-        );
+                dto.getContrasena());
+    }
+
+    /** Mapea de DTO a Aggregate para nuevo usuario (sin ID) */
+    public static UserAggregate fromDtoForCreation(UserDto dto) {
+        return new UserAggregate(
+                dto.getUsuario(),
+                dto.getEmail(),
+                dto.getNombre(),
+                dto.getApellido(),
+                dto.getContrasena());
     }
 
     /** Mapea de Aggregate a DTO */
     public UserDto toDto() {
         return new UserDto(
-                id, usuario, email, nombre, apellido, contrasena
-        );
+                id, usuario, email, nombre, apellido, contrasena);
     }
 }

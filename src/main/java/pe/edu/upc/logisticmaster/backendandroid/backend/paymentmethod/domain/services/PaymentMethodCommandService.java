@@ -30,18 +30,10 @@ public class PaymentMethodCommandService {
             }
         }
 
-        PaymentMethodAggregate agg = new PaymentMethodAggregate();
-        agg.setUserId(dto.getUserId());
-        agg.setIsDefault(dto.getIsDefault());
-        agg.setCardType(dto.getCardType());
-        agg.setCardNumber(dto.getCardNumber());
-        agg.setCardHolder(dto.getCardHolder());
-        agg.setExpiryDate(dto.getExpiryDate());
-        agg.setCvv(dto.getCvv());
+        PaymentMethodAggregate agg = PaymentMethodAggregate.fromDtoForCreation(dto);
         agg = repo.save(agg);
 
-        dto.setId(agg.getId());
-        return dto;
+        return agg.toDto();
     }
 
     @Transactional

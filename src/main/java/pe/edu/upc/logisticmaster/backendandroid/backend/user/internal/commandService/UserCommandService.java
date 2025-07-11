@@ -17,7 +17,8 @@ public class UserCommandService {
 
     /** Crea un usuario */
     public UserDto create(UserDto dto) {
-        UserAggregate agg = UserAggregate.fromDto(dto);
+        // Usar método especial para creación que no incluye ID
+        UserAggregate agg = UserAggregate.fromDtoForCreation(dto);
         UserAggregate saved = repo.save(agg);
         return saved.toDto();
     }

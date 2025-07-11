@@ -1,5 +1,5 @@
 // src/main/java/pe/edu/upc/logisticmaster/backendandroid/backend/user/service/UserService.java
-package pe.edu.upc.logisticmaster.backendandroid.backend.user.service;
+package pe.edu.upc.logisticmaster.backendandroid.backend.user.domain.services;
 
 import org.springframework.stereotype.Service;
 import pe.edu.upc.logisticmaster.backendandroid.backend.user.internal.commandService.UserCommandService;

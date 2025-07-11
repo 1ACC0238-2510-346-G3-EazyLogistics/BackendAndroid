@@ -33,7 +33,7 @@ public class FavoriteHotelController {
      * @param userId Identificador del usuario.
      * @return Lista de favoritos del usuario.
      */
-    @GetMapping("/users/{userId}/favorites")
+    @GetMapping("/api/users/{userId}/favorites")
     public List<FavoriteHotelDto> listByUser(@PathVariable Long userId) {
         return query.findByUserId(userId);
     }
@@ -45,7 +45,7 @@ public class FavoriteHotelController {
      * @param id     Identificador del registro favorito.
      * @return DTO del favorito.
      */
-    @GetMapping("/users/{userId}/favorites/{id}")
+    @GetMapping("/api/users/{userId}/favorites/{id}")
     public FavoriteHotelDto getById(
             @PathVariable Long userId,
             @PathVariable Long id
@@ -60,7 +60,7 @@ public class FavoriteHotelController {
      * @param dto    Datos del favorito a crear.
      * @return Response con código 201 y DTO creado.
      */
-    @PostMapping("/users/{userId}/favorites")
+    @PostMapping("/api/users/{userId}/favorites")
     public ResponseEntity<FavoriteHotelDto> create(
             @PathVariable Long userId,
             @RequestBody FavoriteHotelDto dto
@@ -80,7 +80,7 @@ public class FavoriteHotelController {
      * @param dto    Nuevos datos para el favorito.
      * @return DTO actualizado.
      */
-    @PutMapping("/users/{userId}/favorites/{id}")
+    @PutMapping("/api/users/{userId}/favorites/{id}")
     public FavoriteHotelDto update(
             @PathVariable Long userId,
             @PathVariable Long id,
@@ -96,7 +96,7 @@ public class FavoriteHotelController {
      * @param userId Identificador del usuario.
      * @param id     Identificador del registro favorito.
      */
-    @DeleteMapping("/users/{userId}/favorites/{id}")
+    @DeleteMapping("/api/users/{userId}/favorites/{id}")
     public ResponseEntity<Void> deleteById(
             @PathVariable Long userId,
             @PathVariable Long id
@@ -112,7 +112,7 @@ public class FavoriteHotelController {
      * @param hotelId Identificador del hotel.
      * @return true si existe el favorito, false en caso contrario.
      */
-    @GetMapping("/users/{userId}/favorites/hotel/{hotelId}/exists")
+    @GetMapping("/api/users/{userId}/favorites/hotel/{hotelId}/exists")
     public ResponseEntity<Boolean> existsByUserAndHotel(
             @PathVariable Long userId,
             @PathVariable Long hotelId
@@ -127,7 +127,7 @@ public class FavoriteHotelController {
      * @param userId  Identificador del usuario.
      * @param hotelId Identificador del hotel.
      */
-    @DeleteMapping("/users/{userId}/favorites/hotel/{hotelId}")
+    @DeleteMapping("/api/users/{userId}/favorites/hotel/{hotelId}")
     public ResponseEntity<Void> deleteByUserAndHotel(
             @PathVariable Long userId,
             @PathVariable Long hotelId
@@ -145,7 +145,7 @@ public class FavoriteHotelController {
      *
      * @return Lista completa de favoritos.
      */
-    @GetMapping("/favorites")
+    @GetMapping("/api/favorites")
     public List<FavoriteHotelDto> listAll() {
         return query.findAll();
     }
@@ -156,7 +156,7 @@ public class FavoriteHotelController {
      * @param id Identificador del registro favorito.
      * @return DTO del favorito.
      */
-    @GetMapping("/favorites/{id}")
+    @GetMapping("/api/favorites/{id}")
     public FavoriteHotelDto getGlobalById(@PathVariable Long id) {
         return query.findById(id);
     }
@@ -167,7 +167,7 @@ public class FavoriteHotelController {
      * @param hotelId Identificador del hotel.
      * @return Lista de favoritos filtrada por hotel.
      */
-    @GetMapping("/favorites/hotel/{hotelId}")
+    @GetMapping("/api/favorites/hotel/{hotelId}")
     public List<FavoriteHotelDto> listByHotel(@PathVariable Long hotelId) {
         return query.findByHotelId(hotelId);
     }

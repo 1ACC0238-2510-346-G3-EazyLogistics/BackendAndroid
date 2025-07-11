@@ -28,17 +28,17 @@ public class ReviewController {
 
     // CRUD básico
 
-    @GetMapping("/reviews")
+    @GetMapping("/api/reviews")
     public List<ReviewDto> listAll() {
         return query.findAll();
     }
 
-    @GetMapping("/reviews/{id}")
+    @GetMapping("/api/reviews/{id}")
     public ReviewDto get(@PathVariable Long id) {
         return query.findById(id);
     }
 
-    @PostMapping("/hotels/{hotelId}/reviews")
+    @PostMapping("/api/hotels/{hotelId}/reviews")
     public ResponseEntity<ReviewDto> create(
             @PathVariable Long hotelId,
             @RequestBody ReviewDto dto
@@ -49,7 +49,7 @@ public class ReviewController {
                 .body(created);
     }
 
-    @PutMapping("/reviews/{id}")
+    @PutMapping("/api/reviews/{id}")
     public ReviewDto update(
             @PathVariable Long id,
             @RequestBody ReviewDto dto
@@ -57,7 +57,7 @@ public class ReviewController {
         return command.update(id, dto);
     }
 
-    @DeleteMapping("/reviews/{id}")
+    @DeleteMapping("/api/reviews/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         command.delete(id);
         return ResponseEntity.noContent().build();
@@ -65,17 +65,17 @@ public class ReviewController {
 
     // Conveniencia
 
-    @GetMapping("/hotels/{hotelId}/reviews")
+    @GetMapping("/api/hotels/{hotelId}/reviews")
     public List<ReviewDto> byHotel(@PathVariable Long hotelId) {
         return query.findByHotel(hotelId);
     }
 
-    @GetMapping("/reviews/search/rating")
+    @GetMapping("/api/reviews/search/rating")
     public List<ReviewDto> byMinRating(@RequestParam Integer min) {
         return query.findByMinRating(min);
     }
 
-    @GetMapping("/reviews/search/date")
+    @GetMapping("/api/reviews/search/date")
     public List<ReviewDto> byDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
@@ -85,12 +85,12 @@ public class ReviewController {
         return query.findByDateRange(start, end);
     }
 
-    @GetMapping("/reviews/search/comment")
+    @GetMapping("/api/reviews/search/comment")
     public List<ReviewDto> searchComment(@RequestParam String text) {
         return query.searchByComment(text);
     }
 
-    @GetMapping("/hotels/{hotelId}/reviews/average")
+    @GetMapping("/api/hotels/{hotelId}/reviews/average")
     public ResponseEntity<Double> averageRating(@PathVariable Long hotelId) {
         return ResponseEntity.ok(query.getAverageRating(hotelId));
     }

@@ -1,4 +1,4 @@
-package pe.edu.upc.logisticmaster.backendandroid.backend.task.domain.services;
+package pe.edu.upc.logisticmaster.backendandroid.backend.task.internal.QueryService;
 
 import java.util.List;
 import java.util.stream.Collectors;

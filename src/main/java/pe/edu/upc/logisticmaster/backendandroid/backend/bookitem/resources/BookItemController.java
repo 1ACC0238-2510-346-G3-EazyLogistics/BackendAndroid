@@ -29,12 +29,12 @@ public class BookItemController {
     }
 
     // — CRUD estándar por usuario
-    @GetMapping("/users/{userId}/bookings")
+    @GetMapping("/api/users/{userId}/bookings")
     public List<BookItemDto> getByUser(@PathVariable Long userId) {
         return query.findByUserId(userId);
     }
 
-    @GetMapping("/users/{userId}/bookings/{id}")
+    @GetMapping("/api/users/{userId}/bookings/{id}")
     public BookItemDto getById(
             @PathVariable Long userId,
             @PathVariable Long id
@@ -42,7 +42,7 @@ public class BookItemController {
         return query.findById(id);
     }
 
-    @PostMapping("/users/{userId}/bookings")
+    @PostMapping("/api/users/{userId}/bookings")
     public ResponseEntity<BookItemDto> create(
             @PathVariable Long userId,
             @RequestBody BookItemDto dto
@@ -54,7 +54,7 @@ public class BookItemController {
                 .body(created);
     }
 
-    @PutMapping("/users/{userId}/bookings/{id}")
+    @PutMapping("/api/users/{userId}/bookings/{id}")
     public ResponseEntity<BookItemDto> update(
             @PathVariable Long userId,
             @PathVariable Long id,
@@ -64,7 +64,7 @@ public class BookItemController {
         return ResponseEntity.ok(command.update(id, dto));
     }
 
-    @DeleteMapping("/users/{userId}/bookings/{id}")
+    @DeleteMapping("/api/users/{userId}/bookings/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long userId,
             @PathVariable Long id
@@ -75,17 +75,17 @@ public class BookItemController {
 
     // — Endpoints globales
 
-    @GetMapping("/bookings")
+    @GetMapping("/api/bookings")
     public List<BookItemDto> getAll() {
         return query.findAll();
     }
 
-    @GetMapping("/bookings/hotel/{hotelId}")
+    @GetMapping("/api/bookings/hotel/{hotelId}")
     public List<BookItemDto> getByHotel(@PathVariable Long hotelId) {
         return query.findByHotelId(hotelId);
     }
 
-    @GetMapping("/bookings/search")
+    @GetMapping("/api/bookings/search")
     public List<BookItemDto> findByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
@@ -97,7 +97,7 @@ public class BookItemController {
 
     // — Acciones parciales
 
-    @PatchMapping("/users/{userId}/bookings/{id}/pay")
+    @PatchMapping("/api/users/{userId}/bookings/{id}/pay")
     public ResponseEntity<BookItemDto> markAsPaid(
             @PathVariable Long userId,
             @PathVariable Long id
@@ -107,7 +107,7 @@ public class BookItemController {
         return ResponseEntity.ok(command.update(id, dto));
     }
 
-    @PatchMapping("/users/{userId}/bookings/{id}/status")
+    @PatchMapping("/api/users/{userId}/bookings/{id}/status")
     public ResponseEntity<BookItemDto> updateStatus(
             @PathVariable Long userId,
             @PathVariable Long id,
